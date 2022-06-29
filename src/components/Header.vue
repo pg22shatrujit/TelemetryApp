@@ -27,9 +27,9 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
             this.vm = {
-                title: "Demo Vue App",
                 subtitle: "VFS Programming for Games",
             }
+            this.injectGetters(['title'])
         }
 
         goHome( event ) {
