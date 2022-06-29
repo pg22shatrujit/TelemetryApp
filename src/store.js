@@ -8,11 +8,13 @@ Vue.use( Vuex )
 
 // Modules
 import ModelStore from '@/store/modelStore'
+import AppStore from '@/store/appStore'
 
 // Store with modules
 const store = new Vuex.Store({
     modules: {
         ModelStore,
+        AppStore,
     }
 });
 
