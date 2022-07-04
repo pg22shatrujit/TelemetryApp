@@ -13,13 +13,16 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
             <div class="dialog">
 
                 <form class="sample-form">
-                    <label>Sample field
-                        <input name="s1" v-model="formData.sampleOne">
+                    <label>Name
+                        <input name="name" v-model="formData.name">
                     </label><br/>
-                    <label>Number field:
-                        <input name="s2" v-model="formData.sampleTwo">
+                    <label>ID:
+                        <input name="id" type="number" min=0 step=1 v-model="formData.id">
                     </label><br/>
-                    <button value="Submit" class="">Submit</button>
+                    <label>Value:
+                        <input name="val" type="number" v-model="formData.val">
+                    </label><br/>
+                    <button value="Submit" @click.prevent="submitFormData()">Add Record</button>
                 </form>
 
             </div>
@@ -37,14 +40,31 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
             super( name, subComponentList );
             this.vm = {
                 formData: {
-                    sampleOne:"",
-                    sampleTwo:42,
+                    name: null,
+                    id: null,
+                    val: null
                 }
             }
             this.props = {
                 name: String,
             }
             this.injectGetters(['title'])
+            this.injectActions(['addRecord'])
+        }
+
+        submitFormData() {
+            if(this.formData.name == null || this.formData.id == null || this.formData.val == null) return
+            this.formData.id = Math.round(this.formData.id)
+            this.addRecord(this.formData);
+            this.resetFormData();
+
+        }
+        resetFormData() {
+            this.formData = {
+                name: null,
+                id: null,
+                val: null
+            }
         }
     }
 
