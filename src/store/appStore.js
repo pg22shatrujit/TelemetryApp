@@ -14,17 +14,23 @@ export default {
     // PRIVATE: model state of the application, a bunch of POJS objects
     state: {
         appTitle: "Game Telemetry Viewer",
+        records: [],
     },
 
     // PUBLIC: injected into components
     // called to retrieve state data from the store
     getters: {
         title: state => state.appTitle,
+        records: state => state.records,
     },
 
     // PUBLIC: injected into components
     // called to do things to the state via ajax and mutations
     actions: {
+
+        addRecord({ commit }, record ) {
+            commit('ADD_RECORD', record)
+        },
 
         doAction({ commit }, params ) {
             // return promises here if required,
@@ -50,6 +56,7 @@ export default {
 
     // PRIVATE: caled by actions to modify the state to prevent deadlock
     mutations: {
+        ADD_RECORD: ( state, record ) => { state.records.push(record) },
         SET_USER: ( state, info ) => { state.actionData.info = info },
     },
 }
