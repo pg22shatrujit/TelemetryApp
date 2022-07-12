@@ -90,4 +90,8 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         margin: .25em;
         padding-bottom: 1.5em;
     }
+
+    .title {
+        margin: 5px;
+    }
 </style>
