@@ -9,23 +9,28 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 
     <section class="home-container">
         <div class="home">
-            <div>Admin</div>
+            <div class="title">Admin</div>
             <div class="dialog">
 
-                <form class="sample-form">
-                    <label>Name
-                        <input name="name" v-model="formData.name">
+                <form class="sample-form" @submit.prevent="submitFormData()">
+                    <label>Version
+                        <input name="version" v-model="currentRecord.version" required>
                     </label><br/>
                     <label>ID:
-                        <input name="id" type="number" min=0 step=1 v-model="formData.id">
+                        <input name="id" type="number" v-model="currentRecord.id" required>
                     </label><br/>
-                    <label>Value:
-                        <input name="val" type="number" v-model="formData.val">
+                    <label>Session ID:
+                        <input name="sessionID" type="number" v-model="currentRecord.sessionID" required>
                     </label><br/>
-                    <button value="Submit" @click.prevent="submitFormData()">Add Record</button>
+                    <label>Event ID:
+                        <input name="eventID" type="number" v-model="currentRecord.eventID" required>
+                    </label><br/>
+                    <button value="Submit">Post</button>
                 </form>
 
             </div>
+            <br/>
+            <t-table />
         </div>
     </section>
 
@@ -33,42 +38,23 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 <script>
 
     import Controller from '@/mixins/controller'
+    import tTable from '@/components/TelemetryTable'
 
     class AdminController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
-            this.vm = {
-                formData: {
-                    name: null,
-                    id: null,
-                    val: null
-                }
-            }
-            this.props = {
-                name: String,
-            }
-            this.injectGetters(['title'])
-            this.injectActions(['addRecord'])
+            this.injectGetters(['title', 'currentRecord'])
+            this.injectActions(['postRecord', 'resetCurrentRecord'])
         }
 
         submitFormData() {
-            if(this.formData.name == null || this.formData.id == null || this.formData.val == null) return
-            this.formData.id = Math.round(this.formData.id)
-            this.addRecord(this.formData);
-            this.resetFormData();
-
-        }
-        resetFormData() {
-            this.formData = {
-                name: null,
-                id: null,
-                val: null
-            }
+            this.postRecord(this.currentRecord);
+            this.resetCurrentRecord();
         }
     }
 
-    export default new AdminController('pgAdmin');
+    export default new AdminController('pgAdmin', { tTable });
 
 </script>
 <style scoped>
