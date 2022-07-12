@@ -8,13 +8,15 @@ import Vue from 'vue'
 import Router from 'vue-router';
 Vue.use( Router );
 
-import Home from '@/routes/Home.vue'
+import Charts from '@/routes/Charts.vue'
 import About from '@/routes/About.vue'
+import Admin from '@/routes/Admin.vue'
 
 
 export default new Router({
     routes: [
         { path:"/about",     name:"About", component: About },
-        { path:"/", name:"Home", component: Home, props: { name: "DemoApp"} },
+        { path:"/", name:"Charts", component: Charts, props: { name: "DemoApp"} },
+        { path:"/admin", name:"Admin", component: Admin, props: { name: "DemoApp"} },
     ]
 });
