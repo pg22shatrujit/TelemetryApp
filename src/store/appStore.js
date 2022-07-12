@@ -1,62 +1,64 @@
 /*
 VUEX Data Store.
-Copyright (c) 2019. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
+Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 */
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-//const baseURL = `${LOCATION.PROTOCOL}//${LOCATION.HOSTNAME}:${LOCATION.PORT}`;
-//const Remote = Axios.create( { baseURL: baseURL });
+import Axios from 'axios'
 
-// import User from '@/model/user' // import POJS model objects
+import TData from './tData'
+
 
 export default {
-    // PRIVATE: model state of the application, a bunch of POJS objects
+
     state: {
         appTitle: "Game Telemetry Viewer",
-        records: [],
+        records: {},
+        currentRecord: new TData,
     },
 
-    // PUBLIC: injected into components
-    // called to retrieve state data from the store
     getters: {
         title: state => state.appTitle,
         records: state => state.records,
+        hasRecords: state => Object.keys(state.records).length !== 0,
+        currentRecord: state => state.currentRecord
     },
 
-    // PUBLIC: injected into components
-    // called to do things to the state via ajax and mutations
     actions: {
 
-        addRecord({ commit }, record ) {
-            commit('ADD_RECORD', record)
+        postRecord({ commit }, record) {
+            return new Promise(( resolve, reject ) => {
+                Axios.post('http://localhost:5000/api/telemetry/single', { record : record.serialize() })
+                .then(() => { return Axios.get('http://localhost:5000/api/telemetry/single', { params : { id : record.id }} ) } )
+                .then(result => {
+                    commit('SET_RECORD', new TData(result.data.payload))
+                })
+            })
         },
 
-        doAction({ commit }, params ) {
-            // return promises here if required,
-            // this is also where to use AJAX to call a server
-            /*
-            return new Promise(( resolve, reject ) => {
+        resetCurrentRecord({ commit }) {
+            commit('RESET_RECORD')
+        },
 
-                Axios.post('/api/model/action', params )
-                    .then( response => response.data )
-                    .then( data => (data.error ? error => { throw( error ) }: data.payload ))
-                    .then( content => {
-                        commit('SET_USER', content.info )
-                        resolve( content.status );
-                    })
-                    .catch( error => {
-                        console.log('Seems that role has already been taken.')
-                        reject();
-                    })
+        setCurrentRecord({ commit }, record) {
+            commit('SET_CURRENT', record)
+        },
+
+        deleteRecord({ commit }, record) {
+            return new Promise(( resolve, reject ) => {
+                Axios.delete('http://localhost:5000/api/telemetry/single', { params : { id : record.id } })
+                .then(result => {
+                    commit('DELETE_RECORD', result.data.payload)
+                })
             })
-            */
         }
     },
 
-    // PRIVATE: caled by actions to modify the state to prevent deadlock
     mutations: {
-        ADD_RECORD: ( state, record ) => { state.records.push(record) },
-        SET_USER: ( state, info ) => { state.actionData.info = info },
+        SET_RECORD: ( state, record ) => { Vue.set(state.records, record.id, record) },
+        RESET_RECORD: ( state ) => { state.currentRecord = new TData() },
+        SET_CURRENT: ( state, record ) => { state.currentRecord = new TData(record.serialize()) },
+        DELETE_RECORD: ( state, id ) => { Vue.delete(state.records, id) }
     },
 }
