@@ -43,7 +43,4 @@ class TData {
     }
 }
 
-module.exports = {
-    TData,
-    rec
-}
+module.exports = TData

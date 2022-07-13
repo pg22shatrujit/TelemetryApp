@@ -3,10 +3,11 @@ const { response } = require('express')
 const Express = require('express')
 const Result = require('../src/mixins/result')
 
-const TDataRec = require('./tData')
+const TData = require('./tData')
 
 const Router = Express.Router()
 
+// Condense request params into a single object
 mergeParams = (request) => {
     return {
         ...request.params,
@@ -22,36 +23,43 @@ resultOK = ( payload = undefined ) => {
     return result
 }
 
+// Store of records
 let records = {}
 
+// Fetch a single record for client
 Router.get('/single', ( request, response, next ) => {
 
-    // Fetch a single record for client
     const params = mergeParams(request)
     response.send( resultOK(records[params.id].serialize()) )
     next()
 })
 
+// Fetch every record for client
 Router.get('/multi', ( request, response, next ) => {
 
-    // Fetch multiple records for client
-    response.send(resultOK())
+    let payload = {}
+
+    for(id in records) {
+        payload[id] = records[id].serialize()
+    }
+
+    response.send(resultOK(payload))
     next()
 })
 
+// Add/update single record from client
 Router.post('/single', ( request, response, next ) => {
 
-    // Add/update single record from client
     const params = mergeParams(request)
-    let newRecord = new TDataRec.TData(params.record)
+    let newRecord = new TData(params.record)
     records[newRecord.id] = newRecord
     response.send(resultOK())
     next()
 })
 
+// Delete a single record
 Router.delete('/single', ( request, response, next ) => {
 
-    // Delete a single record
     const params = mergeParams(request)
     delete records[params.id]
     response.send(resultOK(params.id))
