@@ -11,7 +11,7 @@ const Path = require('path')
 const HTTP = require('http')
 const FileSystem = require('fs-extra')
 
-const Result = require('../src/mixins/result')
+//const Result = require('../src/mixins/result')
 
 const TelemetryRoute = require('./tRoute')
 
