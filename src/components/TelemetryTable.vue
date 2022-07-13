@@ -12,8 +12,10 @@
                 <th> Version </th>
                 <th> Session ID </th>
                 <th> Event ID </th>
-                <th> Edit </th>
+                <th> Modify </th>
             </tr>
+
+            <!-- Display records with modification options -->
             <tr v-for="record in records" :key=record.id>
                 <td> {{ record.id }} </td>
                 <td> {{ record.version }} </td>
@@ -21,6 +23,7 @@
                 <td> {{ record.eventID }} </td>
                 <td> <button @click.prevent="setCurrentRecord(record)"> Edit </button> <button @click.prevent="deleteRecord(record)"> Delete </button></td>
             </tr>
+
         </table>
     </section>
 
@@ -28,15 +31,18 @@
 <script>
     import Controller from '@/mixins/controller'
 
-    // import other components you use here...
-
     class TTableController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList )
 
-            this.injectGetters(['records', 'hasRecords'])
-            this.injectActions(['setCurrentRecord', 'deleteRecord'])
+            this.injectGetters(['records'])
+            this.injectActions(['setCurrentRecord', 'deleteRecord', 'syncRecords'])
+        }
+
+        // Check for existing records on load
+        onCreated() {
+            this.syncRecords()
         }
     }
 
@@ -44,6 +50,7 @@
 
 </script>
 <style scoped>
+
 section {
     text-align: center;
     width: 100%;
@@ -66,4 +73,5 @@ button {
     padding: none;
     height: auto;
 }
+
 </style>
