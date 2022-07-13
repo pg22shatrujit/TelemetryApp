@@ -1,10 +1,18 @@
 // Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
-export const rec = {
-    id: null,                                // auto generated unique identifier
-    version: null,                 // String from date - auto generated
-    sessionID: null,                          // Session within version
-    eventID: null,                           // Type of event
+// Two copies of this class to get around the `export` - `module.exports` conflict
+// Client-side copy uses `export`
+
+// Auto genereate version from date
+let currentVersion = () => {
+    return new Date().toISOString().split('T')[0]
+}
+
+const rec = {
+    id: -1,                                // auto generated unique identifier
+    version: currentVersion(),             // String from date - auto generated
+    sessionID: 0,                          // Session within version
+    eventID: 0,                            // Type of event
     /*
     location: { X: 0, Y: 0, Z: 0 },        // Event location
     mapName: "base_map",                   // Current level
@@ -22,6 +30,7 @@ export const rec = {
     */
 }
 
+// Class to store data and serialize
 export default class TData {
     constructor( serializedObj = undefined ) {
 
@@ -29,14 +38,16 @@ export default class TData {
             ...rec
         }
         
+        // Update record data if an object is passed to the constructor
         if(serializedObj) {
             this.record = {
-                ...rec,
+                ...this.record,
                 ...JSON.parse(serializedObj)
             }
         }
     }
 
+    // Getters/Setters to read/write data
     get id() { return this.record.id }
     get version() { return this.record.version }
     get sessionID() { return this.record.sessionID }

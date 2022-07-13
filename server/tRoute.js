@@ -16,6 +16,7 @@ mergeParams = (request) => {
     }
 }
 
+// Create and return a result object with payload
 resultOK = ( payload = undefined ) => {
     let result = new Result()
     result.payload = payload

@@ -3,7 +3,7 @@ VFS VUE Single File Component
 
 <pg-admin user="User"/>
 
-Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
+Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 -->
 <template>
 
@@ -48,6 +48,7 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
             this.injectActions(['postRecord', 'resetCurrentRecord'])
         }
 
+        // Posts the editable record and resets the form to defaults
         submitFormData() {
             this.postRecord(this.currentRecord);
             this.resetCurrentRecord();
