@@ -17,7 +17,7 @@ const baseURL = `http://localhost:5000`
 
 // Set base url for local server requests
 const Server = Axios.create({ baseURL: baseURL })
-import TData from './tData'
+import TData from '../../server/tData'
 
 
 export default {

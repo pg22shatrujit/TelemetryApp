@@ -3,7 +3,7 @@ const { response } = require('express')
 const Express = require('express')
 const Result = require('../src/mixins/result')
 
-const TData = require('./tData')
+const TData = require('./tData').default
 
 const Router = Express.Router()
 
@@ -51,6 +51,7 @@ Router.get('/multi', ( request, response, next ) => {
 // Add/update single record from client
 Router.post('/single', ( request, response, next ) => {
 
+    console.log(TData)
     const params = mergeParams(request)
     let newRecord = new TData(params.record)
     records[newRecord.id] = newRecord
