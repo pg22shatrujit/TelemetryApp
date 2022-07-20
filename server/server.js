@@ -42,6 +42,10 @@ class Server {
             .use( CORS( corsOptions )).options('/*', this.corsHandler )
             .use('/api/telemetry', TelemetryRoute );
 
+        // this.api.get("/", ( request, response, next ) => {
+        //     response.send("../docs/index.html")
+        // })
+
         this.run();
     }
 
