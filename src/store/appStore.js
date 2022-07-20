@@ -43,10 +43,6 @@ export default {
             .then(result => {
                 commit('SYNC_RECORDS', result.data.payload)
             })
-            // .then(() => { return Server.get('/api/telemetry/single', { params : { id : record.id }} ) } )
-            // .then(result => {
-            //     commit('SET_RECORD', new TData(result.data.payload))
-            // })
         },
 
         // Grab existing records, used on component creation
