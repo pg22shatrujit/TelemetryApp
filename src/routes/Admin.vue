@@ -17,7 +17,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                         <input name="version" v-model="currentRecord.version" required>
                     </label><br/>
                     <label>ID:
-                        <input name="id" type="number" v-model="currentRecord.id" required>
+                        <input name="id" v-model="currentRecord.id" required>
                     </label><br/>
                     <label>Session ID:
                         <input name="sessionID" type="number" v-model="currentRecord.sessionID" required>
