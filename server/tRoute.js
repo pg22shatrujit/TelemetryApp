@@ -10,8 +10,8 @@ const Router = Express.Router()
 // Condense request params into a single object
 mergeParams = (request) => {
     return {
-        ...request.params,
         ...request.query,
+        ...request.params,
         ...request.body
     }
 }
@@ -28,7 +28,7 @@ resultOK = ( payload = undefined ) => {
 let records = {}
 
 // Fetch a single record for client
-Router.get('/single', ( request, response, next ) => {
+Router.get('/single/:id', ( request, response, next ) => {
 
     const params = mergeParams(request)
     response.send( resultOK(records[params.id].serialize()) )
@@ -43,7 +43,6 @@ Router.get('/multi', ( request, response, next ) => {
     for(id in records) {
         payload[id] = records[id].serialize()
     }
-
     response.send(resultOK(payload))
     next()
 })
@@ -51,7 +50,6 @@ Router.get('/multi', ( request, response, next ) => {
 // Add/update single record from client
 Router.post('/single', ( request, response, next ) => {
 
-    console.log(TData)
     const params = mergeParams(request)
     let newRecord = new TData(params.record)
     records[newRecord.id] = newRecord
