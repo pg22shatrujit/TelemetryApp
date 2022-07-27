@@ -29,17 +29,25 @@ const rec = {
 
 // Class to store data and serialize
 export default class TData {
-    constructor( serializedObj = undefined ) {
+    constructor( params = undefined ) {
 
         this.record = {
             ...rec
         }
         
         // Update record data if an object is passed to the constructor
-        if(serializedObj) {
+        if(params) {
+            if(typeof params === 'string') {
+                this.record = {
+                    ...this.record,
+                    ...JSON.parse( params )
+                }
+                return
+            }
+
             this.record = {
                 ...this.record,
-                ...JSON.parse(serializedObj)
+                ...params
             }
         }
     }
