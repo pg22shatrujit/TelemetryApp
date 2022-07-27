@@ -9,11 +9,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@firebase/firestore": "^3.4.13",
     "axios": "^0.27.2",
     "core-js": "^3.12.1",
     "cors": "^2.8.5",
     "esm": "^3.2.25",
     "express": "^4.18.1",
+    "firebase": "^9.9.1",
     "fs-extra": "^10.1.0",
     "http": "^0.0.1-security",
     "path": "^0.12.7",
