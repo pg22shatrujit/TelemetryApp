@@ -34,15 +34,6 @@ export default class FirebaseConnection extends Connection {
 
     read( request ) {
 
-        // return new Promise( async ( resolve, reject ) => {
-            
-        //     let collection = await this.db.collection(TELEMETRY_COLLECTION)
-        //     let query = collection.where("id", "==", id)
-        //     let result = await query.get()
-        //     resolve( result )
-        //     .catch( error = reject( error ))
-        // })
-
         return new Promise( ( resolve, reject ) => {
             getDocs(collection(this.db, TELEMETRY_COLLECTION))
             .then( querySnapshot => {
