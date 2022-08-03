@@ -38,7 +38,7 @@ export default {
 
             return new Promise(( resolve, reject ) => {
     
-                dataStore.write( 'single', record )
+                dataStore.write( 'single/' + record.id, record )
                 .then( () => { return dataStore.read( 'multi' ) })
                 .then( result => {
                     commit( 'SYNC_RECORDS', result )
@@ -77,7 +77,7 @@ export default {
 
             return new Promise(( resolve, reject ) => {
     
-                dataStore.delete( 'single', record )
+                dataStore.delete( 'single/' + record.id )
                 .then( () => { return dataStore.read( 'multi' ) } )
                 .then( result => {
                     commit( 'SYNC_RECORDS', result )

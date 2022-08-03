@@ -58,7 +58,7 @@ Router.post('/single', ( request, response, next ) => {
 })
 
 // Delete a single record
-Router.delete('/single', ( request, response, next ) => {
+Router.delete('/single/:id', ( request, response, next ) => {
 
     const params = mergeParams(request)
     delete records[params.id]

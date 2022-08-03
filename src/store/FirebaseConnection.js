@@ -78,17 +78,25 @@ export default class FirebaseConnection extends Connection {
         })
     }
 
-    delete( request, data ) {
+    delete( request ) {
+
+        let id = this.getID(request)
         
         return new Promise(( resolve, reject ) => {
             
-            deleteDoc( doc(this.db, TELEMETRY_COLLECTION, data.id ))
+            deleteDoc( doc(this.db, TELEMETRY_COLLECTION, id ))
             .then( result => resolve( result ))
             .catch( error => reject( error ))
         })
     }
     
+    getID( request ) {
+        return request.split("/")[1]
+    }
 
+    callCloudHello() {
+
+    }
 
     close() {}
 }
