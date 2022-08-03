@@ -14,8 +14,8 @@ const rec = {
     location: { X: 0, Y: 0, Z: 0 },        // Event location
     mapName: "base_map",                   // Current level
     actor: {
-        state: 0,                          // Actor ID within session
-        id: 0,                             // Animation state
+        state: 0,                          // Animation state
+        id: 0,                             // Actor ID within session
         health: 100,                       // Current health
         damageDone: 0,                     // Damage dealt so far
         weapon: 0,                         // Weapon type
