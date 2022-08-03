@@ -9,7 +9,7 @@ import Vuex from 'vuex'
 import FirebaseConnection from './FirebaseConnection.js'
 import ExpressConnection from './ExpressConnection.js'
 
-const DEBUG = false
+const DEBUG = true
 let dataStore = new FirebaseConnection()
 if( DEBUG ) dataStore = new ExpressConnection()
 
@@ -23,12 +23,14 @@ export default {
         appTitle: "Game Telemetry Viewer",
         records: {},
         currentRecord: new TData,
+        chartData: [],
     },
 
     getters: {
         title: state => state.appTitle,
         records: state => state.records,
-        currentRecord: state => state.currentRecord
+        currentRecord: state => state.currentRecord,
+        actionSummary: state => state.chartData
     },
 
     actions: {
@@ -85,6 +87,23 @@ export default {
                 })
                 .catch( error => reject( error ))
             })
+        },
+
+        fetchActionSummary({ commit }, params) {
+            // Get data from the server
+
+            // TODO Change to call execute
+            return new Promise(( resolve, reject ) => {
+                const id = '1234'
+                const session = '001'
+                dataStore.read(`actionSummary/${id}/${session}`)
+                .then( result => {
+                    commit('UPDATE_ACTION_SUMMARY', result)
+                    resolve( result.status )
+                })
+                .catch( error => reject( error ))
+            // Fill up chart when we get a response
+            })
         }
     },
 
@@ -110,6 +129,7 @@ export default {
 
         // For testing, setting and deleting a specific local record
         SET_RECORD: ( state, record ) => { Vue.set( state.records, record.id, record ) },
-        DELETE_RECORD: ( state, id ) => { Vue.delete( state.records, id ) }
+        DELETE_RECORD: ( state, id ) => { Vue.delete( state.records, id ) },
+        UPDATE_ACTION_SUMMARY: (state, data ) => { state.chartData = data }
     },
 }

@@ -11,7 +11,8 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         <h3>Telemetry Analysis Charts</h3>
         <div class="container chart-area">
             <div id="chart-1" class="area chart">
-                This is where one chart goes
+                <t-bar-chart :data="actionSummary"/>
+                <button @click="fetchActionSummary()"></button>
             </div>
             <div id="chart-2" class="area chart">
                 This is where two chart goes
@@ -29,6 +30,7 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 <script>
 
     import Controller from '@/mixins/controller'
+    import TBarChart from '@/components/BarChart.vue'
 
     class HomeController extends Controller {
 
@@ -38,15 +40,18 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
                 formData: {
                     sampleOne:"",
                     sampleTwo:42,
-                }
+                },
             }
             this.props = {
                 name: String,
             }
+            this.injectGetters(['actionSummary'])
+            this.injectActions(['fetchActionSummary'])
+
         }
     }
 
-    export default new HomeController('pgHome');
+    export default new HomeController('pgHome', { TBarChart });
 
 </script>
 <style scoped>
