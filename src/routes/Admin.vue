@@ -17,7 +17,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                         <input name="version" v-model="currentRecord.version" required>
                     </label><br/>
                     <label>ID:
-                        <input name="id" v-model="currentRecord.id" required>
+                        <input name="id" v-model="currentRecord.id" disabled>
                     </label><br/>
                     <label>Session ID:
                         <input name="sessionID" type="number" v-model="currentRecord.sessionID" required>
@@ -26,6 +26,11 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                         <input name="eventID" type="number" v-model="currentRecord.eventID" required>
                     </label><br/>
                     <button value="Submit">Post</button>
+                    
+
+                    <!-- TODO New Record button -->
+
+
                 </form>
 
             </div>
@@ -94,5 +99,13 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
     .title {
         margin: 5px;
+    }
+
+    input:disabled {
+        background-color: lightgray;
+        color: white;
+        font-weight: 600;
+        text-shadow: 2px 2px #777;
+        font-size: 105%;
     }
 </style>
