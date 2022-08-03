@@ -138,7 +138,8 @@ export default class FirebaseConnection extends Connection {
     
     // Break request params and get the id
     getID( request ) {
-        return request.split("/")[2]
+        let requestSplit = request.split("/")
+        return requestSplit[ requestSplit.length - 1 ]
     }
 
     close() {}
