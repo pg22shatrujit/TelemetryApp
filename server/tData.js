@@ -1,12 +1,14 @@
 // Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
-// Auto genereate version from date
+export const INDEX_NONE = -1 // Default ID
+
+// Auto generate version from date
 let currentVersion = () => {
     return new Date().toISOString().split('T')[0]
 }
 
 const rec = {
-    id: -1,                                // auto generated unique identifier
+    id: INDEX_NONE,                                // auto generated unique identifier
     version: currentVersion(),             // String from date - auto generated
     sessionID: 0,                          // Session within version
     eventID: 0,                            // Type of event
@@ -29,17 +31,25 @@ const rec = {
 
 // Class to store data and serialize
 export default class TData {
-    constructor( serializedObj = undefined ) {
+    constructor( params = undefined ) {
 
         this.record = {
             ...rec
         }
         
         // Update record data if an object is passed to the constructor
-        if(serializedObj) {
+        if(params) {
+            if(typeof params === 'string') {
+                this.record = {
+                    ...this.record,
+                    ...JSON.parse( params )
+                }
+                return
+            }
+
             this.record = {
                 ...this.record,
-                ...JSON.parse(serializedObj)
+                ...params
             }
         }
     }
