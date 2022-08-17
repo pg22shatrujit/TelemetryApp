@@ -17,7 +17,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                         <input name="version" v-model="currentRecord.version" required>
                     </label><br/>
                     <label>ID:
-                        <input name="id" v-model="currentRecord.id" disabled>
+                        <input name="id" v-model="currentRecord.id" :class="{ disabled: disableID }" :disabled="disableID">
                     </label><br/>
                     <label>Session ID:
                         <input name="sessionID" type="number" v-model="currentRecord.sessionID" required>
@@ -26,11 +26,9 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                         <input name="eventID" type="number" v-model="currentRecord.eventID" required>
                     </label><br/>
                     <button value="Submit">Post</button>
-                    
 
-                    <!-- TODO New Record button -->
-
-
+                    <button @click.prevent="resetCurrentRecord()">New</button>
+                    <button @click.prevent="syncRecords()">Resync</button>
                 </form>
 
             </div>
@@ -44,13 +42,18 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
     import Controller from '@/mixins/controller'
     import tTable from '@/components/TelemetryTable'
+    import { DEBUG } from '@/store/appStore'
 
     class AdminController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
+            this.vm = {
+                disableID: !DEBUG
+            }
+
             this.injectGetters(['title', 'currentRecord'])
-            this.injectActions(['postRecord', 'resetCurrentRecord'])
+            this.injectActions(['postRecord', 'resetCurrentRecord', 'syncRecords'])
         }
 
         // Posts the editable record and resets the form to defaults
@@ -101,11 +104,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
         margin: 5px;
     }
 
-    input:disabled {
-        background-color: lightgray;
-        color: white;
-        font-weight: 600;
-        text-shadow: 2px 2px #777;
-        font-size: 105%;
+    .disabled {
+        background: darkgray;
     }
 </style>

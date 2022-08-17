@@ -48,12 +48,12 @@ Router.get('/multi', ( request, response, next ) => {
 })
 
 // Add/update single record from client
-Router.post('/single', ( request, response, next ) => {
+Router.post('/single/:id', ( request, response, next ) => {
 
     const params = mergeParams(request)
     let newRecord = new TData(params.record)
     records[newRecord.id] = newRecord
-    response.send(resultOK())
+    response.send(resultOK(newRecord.id))
     next()
 })
 

@@ -1,12 +1,14 @@
 // Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
-// Auto genereate version from date
+export const INDEX_NONE = -1 // Default ID
+
+// Auto generate version from date
 let currentVersion = () => {
     return new Date().toISOString().split('T')[0]
 }
 
 const rec = {
-    id: -1,                                // auto generated unique identifier
+    id: INDEX_NONE,                                // auto generated unique identifier
     version: currentVersion(),             // String from date - auto generated
     sessionID: 0,                          // Session within version
     eventID: 0,                            // Type of event

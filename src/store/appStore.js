@@ -9,9 +9,11 @@ import Vuex from 'vuex'
 import FirebaseConnection from './FirebaseConnection.js'
 import ExpressConnection from './ExpressConnection.js'
 
-const DEBUG = true
-let dataStore = new FirebaseConnection()
-if( DEBUG ) dataStore = new ExpressConnection()
+// Flag to toggle between test server and firebase
+export const DEBUG = false
+
+let dataService = new FirebaseConnection()
+if( DEBUG ) dataService = new ExpressConnection()
 
 // Set base url for local server requests
 import TData from '../../server/tData'
@@ -39,11 +41,11 @@ export default {
         postRecord({ commit }, record) {
 
             return new Promise(( resolve, reject ) => {
-    
-                dataStore.write( 'single/' + record.id, record )
-                .then( () => { return dataStore.read( 'multi' ) })
+
+                dataService.write( `/single/${record.id}`, record )
+                .then( id => dataService.read( `/single/${id}` ))
                 .then( result => {
-                    commit( 'SYNC_RECORDS', result )
+                    commit( 'SET_RECORD', result )
                     resolve()
                 })
                 .catch( error => reject( error ))
@@ -55,7 +57,7 @@ export default {
 
             return new Promise(( resolve, reject ) => {
     
-                dataStore.read( 'multi' )
+                dataService.read( '/multi' )
                 .then( result => {
                     commit( 'SYNC_RECORDS', result )
                     resolve()
@@ -79,10 +81,9 @@ export default {
 
             return new Promise(( resolve, reject ) => {
     
-                dataStore.delete( 'single/' + record.id )
-                .then( () => { return dataStore.read( 'multi' ) } )
+                dataService.delete( `/single/${record.id}` )
                 .then( result => {
-                    commit( 'SYNC_RECORDS', result )
+                    commit( 'DELETE_RECORD', record.id )
                     resolve()
                 })
                 .catch( error => reject( error ))
@@ -96,7 +97,7 @@ export default {
             return new Promise(( resolve, reject ) => {
                 const id = '1234'
                 const session = '001'
-                dataStore.read(`actionSummary/${id}/${session}`)
+                dataStore.read(`/actionSummary/${id}/${session}`)
                 .then( result => {
                     commit('UPDATE_ACTION_SUMMARY', result)
                     resolve( result.status )
@@ -111,6 +112,7 @@ export default {
 
         // Update local cache of records
         SYNC_RECORDS: ( state, records ) => {
+
             // Clear records in state
             for( let id in state.records ) {
                 Vue.delete( state.records, id )
@@ -128,7 +130,10 @@ export default {
         SET_CURRENT: ( state, record ) => { state.currentRecord = new TData( record.serialize() ) },
 
         // For testing, setting and deleting a specific local record
-        SET_RECORD: ( state, record ) => { Vue.set( state.records, record.id, record ) },
+        SET_RECORD: ( state, record ) => { 
+            let TDataRecord = new TData( record )
+            Vue.set( state.records, TDataRecord.id, TDataRecord) 
+        },
         DELETE_RECORD: ( state, id ) => { Vue.delete( state.records, id ) },
         UPDATE_ACTION_SUMMARY: (state, data ) => { state.chartData = data }
     },
