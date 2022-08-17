@@ -80,8 +80,9 @@ export default class FirebaseConnection extends Connection {
                     docList[doc.id] = doc.data()
                     docList[doc.id].id = doc.id
                 })
-                .catch(error => reject( error ))
+                resolve( docList )
             })
+            .catch(error => reject( error ))
         })
 
     }
