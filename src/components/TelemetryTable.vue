@@ -12,15 +12,19 @@
                 <th> Version </th>
                 <th> Session ID </th>
                 <th> Event ID </th>
+                <th> State </th>
+                <th> Location </th>
                 <th> Modify </th>
             </tr>
 
             <!-- Display records with modification options -->
-            <tr v-for="record in records" :key=record.id>
+            <tr v-for="record in records" :key="record.id">
                 <td> {{ record.id }} </td>
                 <td> {{ record.version }} </td>
                 <td> {{ record.sessionID }} </td>
                 <td> {{ record.eventID }} </td>
+                <td> {{ stateFromValue(record.playerState) }} </td>
+                <td> {{ record.location ? `${record.location.X}, ${record.location.Y}`: '' }} </td>
                 <td> <button @click.prevent="setCurrentRecord(record)"> Edit </button> <button @click.prevent="deleteRecord(record)"> Delete </button></td>
             </tr>
 
@@ -30,6 +34,7 @@
 </template>
 <script>
     import Controller from '@/mixins/controller'
+    import { PlayerState } from '../../server/tData'
 
     class TTableController extends Controller {
 
@@ -38,6 +43,19 @@
 
             this.injectGetters(['records'])
             this.injectActions(['setCurrentRecord', 'deleteRecord', 'syncRecords'])
+        }
+
+        // Check if the state value has a corresponding key
+        stateFromValue( state ) {
+
+            for( let key in PlayerState ) {
+                if( state == PlayerState[ key ] ) {
+                    return key
+                }
+            }
+
+            // Default return state value
+            return state
         }
 
         // Check for existing records on load
@@ -53,12 +71,21 @@
 
 section {
     text-align: center;
-    width: 100%;
+    width: fit-content;
+    display: inline-block;
 }
 
 table {
     width: 80%;
     margin: 0 auto;
+}
+
+th {
+    padding: 1vh 1vw;
+}
+
+td {
+    padding: .2vh .2vw;
 }
 
 table, th ,td {

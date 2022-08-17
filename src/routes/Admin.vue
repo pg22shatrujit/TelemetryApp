@@ -25,6 +25,19 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                     <label>Event ID:
                         <input name="eventID" type="number" v-model="currentRecord.eventID" required>
                     </label><br/>
+                    <label>State:
+                        <select name="state" v-model="currentRecord.playerState" required>
+                            <option v-for="(state, val) in states" :key="state" :value="state"> {{ val }} </option>
+                        </select>
+                    </label><br/>
+                    <label>Location
+                    </label><br/>
+                    <label>X:
+                        <input name="eventID" type="number" v-model="currentRecord.X" required>
+                    </label><br/>
+                    <label>Y:
+                        <input name="eventID" type="number" v-model="currentRecord.Y" required>
+                    </label><br/>
                     <button value="Submit">Post</button>
 
                     <button @click.prevent="resetCurrentRecord()">New</button>
@@ -32,7 +45,6 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                 </form>
 
             </div>
-            <br/>
             <t-table />
         </div>
     </section>
@@ -43,13 +55,15 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     import Controller from '@/mixins/controller'
     import tTable from '@/components/TelemetryTable'
     import { DEBUG } from '@/store/appStore'
+    import { PlayerState } from '../../server/tData'
 
     class AdminController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
             this.vm = {
-                disableID: !DEBUG
+                disableID: !DEBUG,
+                states: PlayerState
             }
 
             this.injectGetters(['title', 'currentRecord'])
@@ -73,12 +87,17 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
         width: 100%;
     }
 
+    .dialog {
+        width: fit-content;
+        display: inline-block;
+    }
+
     .home {
         margin:2vw;
         border: 1px solid black;
         background-color: lightgray;
         color: black;
-        height: 78vh;
+        height:78vh;
         width: 80vw;
     }
 
