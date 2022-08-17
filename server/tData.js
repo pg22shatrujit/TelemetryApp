@@ -7,11 +7,23 @@ let currentVersion = () => {
     return new Date().toISOString().split('T')[0]
 }
 
+export const PlayerState = {
+    WALK: 0,
+    RUN: 1,
+    CROUCH: 2,
+    PRONE: 3
+}
+
 const rec = {
     id: INDEX_NONE,                                // auto generated unique identifier
     version: currentVersion(),             // String from date - auto generated
     sessionID: 0,                          // Session within version
     eventID: 0,                            // Type of event
+    playerState: PlayerState.WALK,
+    location: {
+        X: 0,
+        Y: 0
+    }
     /*
     location: { X: 0, Y: 0, Z: 0 },        // Event location
     mapName: "base_map",                   // Current level
@@ -59,11 +71,18 @@ export default class TData {
     get version() { return this.record.version }
     get sessionID() { return this.record.sessionID }
     get eventID() { return this.record.eventID }
+    get playerState() { return this.record.playerState }
+    get X() { return this.record.location.X }
+    get Y() { return this.record.location.Y }
+    get location() { return this.record.location }
 
     set id(val) { this.record.id = val }
     set version(val) { this.record.version = val }
     set sessionID(val) { this.record.sessionID = val }
     set eventID(val) { this.record.eventID = val }
+    set playerState(val) { this.record.playerState = val }
+    set X(val) { this.record.location.X = val }
+    set Y(val) { this.record.location.Y = val }
 
     serialize() {
         return JSON.stringify( this.record )
