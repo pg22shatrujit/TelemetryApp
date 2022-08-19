@@ -33,10 +33,10 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
                     <label>Location
                     </label><br/>
                     <label>X:
-                        <input name="eventID" type="number" v-model="currentRecord.X" required>
+                        <input name="eventID" type="number" step="0.01" v-model="currentRecord.X" required>
                     </label><br/>
                     <label>Y:
-                        <input name="eventID" type="number" v-model="currentRecord.Y" required>
+                        <input name="eventID" type="number" step="0.01" v-model="currentRecord.Y" required>
                     </label><br/>
                     <button value="Submit">Post</button>
 
