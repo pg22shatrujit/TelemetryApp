@@ -1,14 +1,7 @@
 require = require("esm")(module)
 const functions = require("firebase-functions")
-const { doc, runTransaction, getDocs, addDoc, collection, deleteField } = require("@firebase/firestore")
-const db = require("./FirestoreSetup.js").db
-
-// Collection names for PlayerState and Location aggregations respectively
-const STATE_AGGREGATE = "PlayerState"
-const LOCATION_AGGREGATE = "Location"
-
-const STATE_KEY = "playerState"
-const LOCATION_KEY = "location"
+const { runTransaction, deleteField } = require("@firebase/firestore")
+const { db, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, TELEMETRY_COLLECTION, STATE_KEY, LOCATION_KEY, getAggregationReference } = require("./FirestoreSetup.js")
 
 // Check two location objects for equality, Object structure => { X: 0.00, Y: 0.00 }
 let isEqualLocation = (locA, locB) => {
@@ -31,24 +24,6 @@ let getKeyData = ( change, key, isBeforeChange = false ) => {
 
     if( isBeforeChange ) return change.before.exists ? change.before.data()[ key ] : null
     return change.after.exists ? change.after.data()[ key ] : null
-}
-
-// Get a reference to the first document in a collection, creating one if the collection is empty
-let getAggregationReference = async ( aggregationCollection ) => {
-
-    const snapshot = await getDocs( collection( db, aggregationCollection ))
-    let aggregationsRef = null
-
-    if( !snapshot.size ) {
-        // Create doc if one doesn't exist and get the reference
-        aggregationsRef = await addDoc( collection( db, aggregationCollection ), {} )
-    }
-    else {
-        // If the collection isn't empty, grab the first doc (Always has only one doc)
-        aggregationsRef = await doc( db, aggregationCollection, snapshot.docs[0].id );
-    }
-
-    return aggregationsRef
 }
 
 let updateStateAggegation = ( aggregation, after, before ) => {
@@ -81,7 +56,7 @@ let runStatesTransaction = async ( change ) => {
         if( newState == oldState ) return
 
         // Get a reference to the state aggregations doc
-        let aggregationsRef = await getAggregationReference( STATE_AGGREGATE )
+        let aggregationsRef = await getAggregationReference( STATE_AGGREGATE_COLLECTION )
         if( !aggregationsRef ) return   
 
         const aggregationsDoc = await transaction.get( aggregationsRef );
@@ -136,14 +111,14 @@ let runLocationsTransaction = async ( change ) => {
     await runTransaction( db, async ( transaction ) => {
 
         // Get values of current and previous states if they exist
-        const newLocation = getKeyData( change, "location" )
-        const oldLocation = getKeyData( change, "location", true )
+        const newLocation = getKeyData( change, LOCATION_KEY )
+        const oldLocation = getKeyData( change, LOCATION_KEY, true )
         
         // Break out if nothing changed
         if( isEqualLocation( newLocation, oldLocation ) ) return
 
         // Get a reference to the state aggregations doc
-        let aggregationsRef = await getAggregationReference( LOCATION_AGGREGATE )
+        let aggregationsRef = await getAggregationReference( LOCATION_AGGREGATE_COLLECTION )
         if( !aggregationsRef ) return
 
         const aggregationsDoc = await transaction.get( aggregationsRef );
@@ -158,7 +133,7 @@ let runLocationsTransaction = async ( change ) => {
 
 // Update necessary collections everytime a document in the telemetry collection gets updated
 exports.aggregateTelemetryData = functions.firestore
-    .document( 'Telemetry/{recordID}' )
+    .document( `${TELEMETRY_COLLECTION}/{recordID}` )
     .onWrite(async (change, context) => {
 
         let aggregationTransactions = []
@@ -169,29 +144,3 @@ exports.aggregateTelemetryData = functions.firestore
 
         await Promise.all(aggregationTransactions)
     })
-
-// class TelemetryFunctions {
-
-//     constructor() {
-
-//         fb.initializeApp()
-//         this.db = getFirestore(fb)
-//         functions = getFunctions(getApp());
-//         connectFunctionsEmulator(functions, "localhost", 5001);
-//     }
-    
-//     get exports() {
-//         return {
-//             helloWorld: this.functions.https.onRequest( this.helloWorld )
-//         }
-//     }
-
-//     helloWorld( request, response ) {
-
-//         functions.logger.info( "Hello logs!", { structuredData: true });
-//         response.send( "Hello from Firebase!" );
-//     }
-// }
-
-// const telemetryfunctions = new TelemetryFunctions()
-// exports = telemetryfunctions.exports
