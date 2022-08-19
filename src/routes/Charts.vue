@@ -11,8 +11,7 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         <h3>Telemetry Analysis Charts</h3>
         <div class="container chart-area">
             <div id="chart-1" class="area chart">
-                <t-bar-chart :data="actionSummary"/>
-                <button @click="fetchActionSummary()"></button>
+                <t-bar-chart :data="chartData" title="Player States" subtitle="Count of occurances"/>
             </div>
             <div id="chart-2" class="area chart">
                 This is where two chart goes
@@ -45,9 +44,13 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
             this.props = {
                 name: String,
             }
-            this.injectGetters(['actionSummary'])
-            this.injectActions(['fetchActionSummary'])
+            this.injectGetters(['chartData'])
+            this.injectActions(['fetchChartData'])
+        }
 
+        // Check for existing records on load
+        onCreated() {
+            this.fetchChartData()
         }
     }
 

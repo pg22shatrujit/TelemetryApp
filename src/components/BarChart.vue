@@ -1,7 +1,7 @@
 <!--
 VFS VUE Single File Component
 
-<t-bar-chart :data="dataObject" />
+<t-bar-chart :data="dataObject", title="Title", subtitle="SubTitle" />
 
 Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 -->
@@ -37,14 +37,22 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
                 title: "Bar Chart",
                 chartOptions: {
                     chart: {
-                    title: 'Company Performance',
-                    subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                    title: "Placeholder Title",
+                    subtitle: "Placeholder Subtitle",
                     }
                 }
             }
             this.props = {
-                data: Array
+                data: Array,
+                title: String,
+                subtitle: String
             }
+        }
+
+        // Check for existing records on load
+        onCreated() {
+            this.chartOptions.title = this.title
+            this.chartOptions.subtitle = this.subtitle
         }
     }
 

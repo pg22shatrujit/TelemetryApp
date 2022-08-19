@@ -4,17 +4,16 @@
 
 import Connection from "./connection"
 import Axios from 'axios'
-import { INDEX_NONE } from "../../server/tData";
+import { INDEX_NONE, PlayerState } from "../../server/tData";
 
 // Import the functions you need from the SDKs you need
 import { collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { db } from "../../functions/FirestoreSetup"
+import { db, TELEMETRY_COLLECTION, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, getAggregationReference } from "../../functions/FirestoreSetup"
 
 const baseURL = `http://localhost:5001`
 const prefix = `/telemetrytracking/us-central1`
 
 // Commonly used values as constants
-const TELEMETRY_COLLECTION = "Telemetry" // Collection that records get written to
 export const LOCAL_EMULATOR = true
 const FUNCTIONS_URL = 'https://us-central1-telemetrytracking.cloudfunctions.net/'
 
@@ -34,7 +33,6 @@ export default class FirebaseConnection extends Connection {
 
             this.functions.get('helloWorld')
             .then( result => {
-                console.log( result )
                 resolve()
             })
             .catch( error => reject( error ))
@@ -141,14 +139,54 @@ export default class FirebaseConnection extends Connection {
         })
     }
 
-    callCloudHello() {
-        
-        this.functionsAPI.get( `${prefix}/helloWorld` )
-        .then( content => {
+    loadVizData( isHeatMap = false ) {
+
+        return new Promise(( resolve, reject ) => {
+
+            getAggregationReference( isHeatMap ? LOCATION_AGGREGATE_COLLECTION : STATE_AGGREGATE_COLLECTION )
+            .then( aggregationsRef => {
+                if ( !aggregationsRef ) reject("Couldn't find document reference")
+
+                getDoc( aggregationsRef )
+                .then( aggregationsDoc => {
+
+                    resolve( aggregationsDoc.data() ) 
+                })
+                .catch( error => reject( error ) )
+            })
+            .catch( error => reject( error ) )
         })
-        .catch( error => {
-            
-        } )
+    }
+
+    getChartData() {
+
+        return new Promise(( resolve, reject ) => {
+
+            this.loadVizData()
+            .then( data => {
+                let formattedData = [
+                    [ "Player State", "Occurances" ]
+                ]
+
+                Object.keys( PlayerState ).forEach( ( state ) => {
+                    let stateVal = data.hasOwnProperty( PlayerState[ state ] ) ? data[ PlayerState[ state ] ]: 0
+                    formattedData.push( [ state, stateVal ] )
+                })
+                
+                resolve( formattedData ) 
+            })
+        })
+    }
+
+    getHeatMapData() {
+
+        return new Promise(( resolve, reject ) => {
+
+            this.loadVizData( true )
+            .then( data => {
+                resolve( data )
+            })
+        })
     }
 
     // Break request params and get the id

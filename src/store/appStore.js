@@ -31,7 +31,7 @@ export default {
         title: state => state.appTitle,
         records: state => state.records,
         currentRecord: state => state.currentRecord,
-        actionSummary: state => state.chartData
+        chartData: state => state.chartData
     },
 
     actions: {
@@ -89,14 +89,14 @@ export default {
             })
         },
 
-        fetchActionSummary({ commit }, params) {
+        fetchChartData({ commit }, params) {
             // Get data from the server
 
             // TODO Change to call execute
             return new Promise(( resolve, reject ) => {
                 const id = '1234'
                 const session = '001'
-                dataService.read(`/actionSummary/${id}/${session}`)
+                dataService.getChartData()
                 .then( result => {
                     commit('UPDATE_ACTION_SUMMARY', result)
                     resolve( result.status )
@@ -142,6 +142,8 @@ export default {
             Vue.set( state.records, TDataRecord.id, TDataRecord) 
         },
         DELETE_RECORD: ( state, id ) => { Vue.delete( state.records, id ) },
-        UPDATE_ACTION_SUMMARY: (state, data ) => { state.chartData = data }
+        UPDATE_ACTION_SUMMARY: (state, data ) => { 
+            state.chartData = data
+        }
     },
 }
