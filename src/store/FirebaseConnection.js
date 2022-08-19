@@ -7,12 +7,15 @@ import Axios from 'axios'
 import { INDEX_NONE } from "../../server/tData";
 
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { db } from "../../functions/FirestoreSetup"
+
+const baseURL = `http://localhost:5001`
+const prefix = `/telemetrytracking/us-central1`
 
 // Commonly used values as constants
 const TELEMETRY_COLLECTION = "Telemetry" // Collection that records get written to
-const LOCAL_EMULATOR = false
+export const LOCAL_EMULATOR = true
 const FUNCTIONS_URL = 'https://us-central1-telemetrytracking.cloudfunctions.net/'
 
 export default class FirebaseConnection extends Connection {
@@ -20,20 +23,8 @@ export default class FirebaseConnection extends Connection {
     constructor() {
         super()
 
-        // Initialize firebase app and get access to dataStore
-        const firebaseConfig = {
-            apiKey: "AIzaSyDL4QcDPhMwaAWEpP9Ry-OO-8SieiHqsxE",
-            authDomain: "telemetrytracking.firebaseapp.com",
-            projectId: "telemetrytracking",
-            storageBucket: "telemetrytracking.appspot.com",
-            messagingSenderId: "664459976338",
-            appId: "1:664459976338:web:085df2cf6669b5695f504b",
-            measurementId: "G-LL3H2ZYGLK"
-        }
-
         this.functions = Axios.create({ baseURL: FUNCTIONS_URL })
-        const app = initializeApp( firebaseConfig )
-        this.db = getFirestore( app )
+        this.functionsAPI = Axios.create({ baseURL: baseURL })
     }
 
     open() {}
@@ -58,7 +49,7 @@ export default class FirebaseConnection extends Connection {
 
             return new Promise(( resolve, reject ) => {
 
-                getDoc( doc( this.db, TELEMETRY_COLLECTION, id ))
+                getDoc( doc( db, TELEMETRY_COLLECTION, id ))
                 .then( docSnapshot => {
                     let record = { ...docSnapshot.data() }
                     record.id = id
@@ -71,7 +62,7 @@ export default class FirebaseConnection extends Connection {
         // If not, read all
         return new Promise(( resolve, reject ) => {
 
-            getDocs( collection( this.db, TELEMETRY_COLLECTION ))
+            getDocs( collection( db, TELEMETRY_COLLECTION ))
             .then( querySnapshot => {
 
                 // Iterate through the snapshot and create an object of all values
@@ -103,21 +94,20 @@ export default class FirebaseConnection extends Connection {
 
             // ID is not the default
             if( id != INDEX_NONE ) {
-
-                getDoc( doc( this.db, TELEMETRY_COLLECTION, id ))
+                
+                getDoc( doc( db, TELEMETRY_COLLECTION, id ))
                 .then( docSnapshot => {
-
                     // Update if the doc exists
                     if( docSnapshot.exists() ) {
 
-                        setDoc( doc( this.db, TELEMETRY_COLLECTION, id ), record, { merge: true } )
+                        setDoc( doc( db, TELEMETRY_COLLECTION, id ), record, { merge: true } )
                         .then( result => resolve( id ))
                         .catch( error => reject( error ))
                     }
                     // Create a new doc if it doesn't 
                     else {
 
-                        addDoc( collection( this.db, TELEMETRY_COLLECTION ), record )
+                        addDoc( collection( db, TELEMETRY_COLLECTION ), record )
                         .then( result => resolve( result.id ))
                         .catch( error => reject( error ))
                     }
@@ -127,7 +117,7 @@ export default class FirebaseConnection extends Connection {
             else {
 
                 // If id is the default, create a new record
-                addDoc( collection(this.db, TELEMETRY_COLLECTION), record )
+                addDoc( collection(db, TELEMETRY_COLLECTION), record )
                 .then( result => resolve( result.id ))
                 .catch( error => reject( error ))
             }
@@ -145,14 +135,22 @@ export default class FirebaseConnection extends Connection {
         return new Promise(( resolve, reject ) => {
             
             // Delete record by id
-            deleteDoc( doc(this.db, TELEMETRY_COLLECTION, id ))
+            deleteDoc( doc(db, TELEMETRY_COLLECTION, id ))
             .then( result => resolve( result ))
             .catch( error => reject( error ))
         })
     }
 
     callCloudHello() {
+        
+        this.functionsAPI.get( `${prefix}/helloWorld` )
+        .then( content => {
+        })
+        .catch( error => {
+            
+        } )
     }
+
     // Break request params and get the id
     getID( request ) {
         return request.split("/")[2]
