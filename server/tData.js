@@ -15,12 +15,12 @@ export const PlayerState = {
 }
 
 const rec = {
-    id: INDEX_NONE,                                // auto generated unique identifier
+    id: INDEX_NONE,                        // auto generated unique identifier
     version: currentVersion(),             // String from date - auto generated
     sessionID: 0,                          // Session within version
     eventID: 0,                            // Type of event
-    playerState: PlayerState.WALK,
-    location: {
+    playerState: PlayerState.WALK,         // Current state of the player character
+    location: {                            // 2D representation of the player's location
         X: 0,
         Y: 0
     }
@@ -41,13 +41,17 @@ const rec = {
     */
 }
 
+// Create a deep copy of constant rec
+// Using since spread operator doesn't deep copy nested objects like location
+let cloneRec = () => {
+    return JSON.parse( JSON.stringify ( rec ) )
+}
+
 // Class to store data and serialize
 export default class TData {
     constructor( params = undefined ) {
 
-        this.record = {
-            ...rec
-        }
+        this.record = cloneRec()
         
         // Update record data if an object is passed to the constructor
         if(params) {
