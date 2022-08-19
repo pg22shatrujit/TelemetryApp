@@ -5,7 +5,7 @@
 -->
 <template>
 
-    <section>
+    <section :class="{ debug: debugWidth }">
         <table>
             <tr>
                 <th> ID </th>
@@ -35,11 +35,15 @@
 <script>
     import Controller from '@/mixins/controller'
     import { PlayerState } from '../../server/tData'
+    import { LOCAL_EMULATOR } from '@/store/FirebaseConnection'
 
     class TTableController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList )
+            this.vm = {
+                debugWidth: LOCAL_EMULATOR,
+            }
 
             this.injectGetters(['records'])
             this.injectActions(['setCurrentRecord', 'deleteRecord', 'syncRecords'])
@@ -73,6 +77,10 @@ section {
     text-align: center;
     width: fit-content;
     display: inline-block;
+}
+
+.debug {
+    width: 20vw;
 }
 
 table {

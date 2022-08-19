@@ -10,7 +10,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     <section class="home-container">
         <div class="home">
             <div class="title">Admin</div>
-            <div class="dialog">
+            <div class="dialog" :class="{ debug: debugWidth }">
 
                 <form class="sample-form" @submit.prevent="submitFormData()">
                     <label>Version
@@ -55,6 +55,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     import Controller from '@/mixins/controller'
     import tTable from '@/components/TelemetryTable'
     import { DEBUG } from '@/store/appStore'
+    import { LOCAL_EMULATOR } from '@/store/FirebaseConnection'
     import { PlayerState } from '../../server/tData'
 
     class AdminController extends Controller {
@@ -63,6 +64,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
             super( name, subComponentList );
             this.vm = {
                 disableID: !DEBUG,
+                debugWidth: LOCAL_EMULATOR,
                 states: PlayerState
             }
 
@@ -90,6 +92,10 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     .dialog {
         width: fit-content;
         display: inline-block;
+    }
+
+    .debug {
+        /* width: 20vw; */
     }
 
     .home {

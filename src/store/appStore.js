@@ -3,7 +3,6 @@ VUEX Data Store.
 Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 */
 import Vue from 'vue'
-import Vuex from 'vuex'
 
 
 import FirebaseConnection from './FirebaseConnection.js'
@@ -97,7 +96,7 @@ export default {
             return new Promise(( resolve, reject ) => {
                 const id = '1234'
                 const session = '001'
-                dataStore.read(`/actionSummary/${id}/${session}`)
+                dataService.read(`/actionSummary/${id}/${session}`)
                 .then( result => {
                     commit('UPDATE_ACTION_SUMMARY', result)
                     resolve( result.status )
@@ -105,6 +104,14 @@ export default {
                 .catch( error => reject( error ))
             // Fill up chart when we get a response
             })
+        },
+
+        callHelloWorld({ commit }, params) {
+            // Get data from the server
+
+            // TODO Change to call execute
+            dataService.callCloudHello()
+            // Fill up chart when we get a response
         }
     },
 
