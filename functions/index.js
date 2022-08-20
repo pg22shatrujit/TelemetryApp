@@ -1,7 +1,9 @@
+// Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
+
 require = require("esm")(module)
 const functions = require("firebase-functions")
 const { runTransaction, deleteField } = require("@firebase/firestore")
-const { db, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, TELEMETRY_COLLECTION, STATE_KEY, LOCATION_KEY, getAggregationReference } = require("./FirestoreSetup.js")
+const { db, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, TELEMETRY_COLLECTION, STATE_KEY, LOCATION_KEY, LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY, getAggregationReference } = require("./FirestoreSetup.js")
 
 // Check two location objects for equality, Object structure => { X: 0.00, Y: 0.00 }
 let isEqualLocation = (locA, locB) => {
@@ -69,17 +71,36 @@ let runStatesTransaction = async ( change ) => {
     });
 }
 
+// Get a reference to the first document in a collection, creating one if the collection is empty
+findLocationMaxima = ( newMaximum, aggregationValues ) => {
+    console.log(aggregationValues)
+    for( let xKeys in aggregationValues ) {
+        for( let yKeys in aggregationValues[ xKeys ] ) {
+            let numPoints = aggregationValues[ xKeys ][ yKeys]
+            if( numPoints > newMaximum ) newMaximum = numPoints
+        }
+    }
+
+    return newMaximum
+}
+
 let updateLocationAggregation = ( aggregation, after, before ) => {
 
+        if( !aggregation.hasOwnProperty( LOCATION_MAXIMUM_KEY ) ) aggregation[ LOCATION_MAXIMUM_KEY ] = 0
+        if( !aggregation.hasOwnProperty( LOCATION_OBJECTS_KEY ) ) aggregation[ LOCATION_OBJECTS_KEY ] = {}
+        
+        let aggregationValues = aggregation[ LOCATION_OBJECTS_KEY ]
         // Location exists and has X, Y values
         if( after != null && after.X != undefined && after.Y != undefined ) {
             
             let xIndex = Math.round( after.X )
             let yIndex = Math.round( after.Y )
 
-            if( !aggregation.hasOwnProperty( `${ xIndex }` ) ) aggregation[ xIndex ] = {}
-            if( !aggregation[ xIndex ].hasOwnProperty( `${ yIndex }` ) ) aggregation[ xIndex ][ yIndex ] = 0
-            ++aggregation[ xIndex ][ yIndex ]
+            if( !aggregationValues.hasOwnProperty( `${ xIndex }` ) ) aggregationValues[ xIndex ] = {}
+            if( !aggregationValues[ xIndex ].hasOwnProperty( `${ yIndex }` ) ) aggregationValues[ xIndex ][ yIndex ] = 0
+            ++aggregationValues[ xIndex ][ yIndex ]
+
+            if( aggregationValues[ xIndex ][ yIndex ] > aggregation[ LOCATION_MAXIMUM_KEY ] ) aggregation[ LOCATION_MAXIMUM_KEY ] = aggregationValues[ xIndex ][ yIndex ]
         }
 
         // Location exists and has X, Y values
@@ -88,21 +109,27 @@ let updateLocationAggregation = ( aggregation, after, before ) => {
             let xIndex = Math.round( before.X )
             let yIndex = Math.round( before.Y )
 
-            if( aggregation.hasOwnProperty( `${ xIndex }` ) ) {
+            if( aggregationValues.hasOwnProperty( `${ xIndex }` ) ) {
 
-                if( aggregation[ xIndex ].hasOwnProperty( `${ yIndex }` ) ) {
+                if( aggregationValues[ xIndex ].hasOwnProperty( `${ yIndex }` ) ) {
 
                     // If both indexes exist, decrement the count for the old value
-                    aggregation[ xIndex ][ yIndex ]--
+                    aggregationValues[ xIndex ][ yIndex ]--
+
+                    if( aggregationValues[ xIndex ][ yIndex ] >= aggregation[ LOCATION_MAXIMUM_KEY ] - 1 )
+                    {
+                        aggregation[ LOCATION_MAXIMUM_KEY ] = findLocationMaxima( aggregation[ LOCATION_MAXIMUM_KEY ] - 1, aggregationValues )
+                    }
+
 
                     // Remove the key if the count is 0 or less
-                    if( aggregation[ xIndex ][ yIndex ] <= 0 ) {
-                        delete aggregation[ xIndex ][ yIndex ]
+                    if( aggregationValues[ xIndex ][ yIndex ] <= 0 ) {
+                        delete aggregationValues[ xIndex ][ yIndex ]
                     }
                 }
                 
                 // Check size of the xIndex and delete if its empty 
-                if( Object.keys( aggregation[ xIndex ] ).length == 0  ) aggregation[ xIndex ] = deleteField()
+                if( Object.keys( aggregationValues[ xIndex ] ).length == 0  ) delete aggregationValues[ xIndex ]
             }
         }
 }
