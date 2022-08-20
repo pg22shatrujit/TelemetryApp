@@ -35,14 +35,14 @@
 <script>
     import Controller from '@/mixins/controller'
     import { PlayerState } from '../../server/tData'
-    import { LOCAL_EMULATOR } from '@/store/FirebaseConnection'
+    import { EMULATOR } from '../../functions/FirestoreSetup'
 
     class TTableController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList )
             this.vm = {
-                debugWidth: LOCAL_EMULATOR,
+                debugWidth: EMULATOR,
             }
 
             this.injectGetters(['records'])
