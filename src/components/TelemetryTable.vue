@@ -1,11 +1,14 @@
 <!--
-<t-table :record="myRecord" />
+<t-table max-records="10" />
 
 @Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 -->
 <template>
 
     <section :class="{ debug: debugWidth }">
+        <button @click.prevent="fetchRecords( startIndex - maxRecords )">Previous</button>
+        {{ startIndex + 1 }} to {{ ( startIndex + maxRecords ) > maxSize ? maxSize : startIndex + maxRecords  }} of {{ maxSize }}
+        <button @click.prevent="fetchRecords( startIndex + maxRecords )">Next</button>
         <table>
             <tr>
                 <th> ID </th>
@@ -18,7 +21,7 @@
             </tr>
 
             <!-- Display records with modification options -->
-            <tr v-for="record in records" :key="record.id">
+            <tr v-for="record in displayedRecords" :key="record.id">
                 <td> {{ record.id }} </td>
                 <td> {{ record.version }} </td>
                 <td> {{ record.sessionID }} </td>
@@ -43,6 +46,12 @@
             super( name, subComponentList )
             this.vm = {
                 debugWidth: EMULATOR,
+                displayedRecords: [],
+                startIndex: 0,
+                maxSize: 0
+            }
+            this.props = {
+                maxRecords: Number
             }
 
             this.injectGetters(['records'])
@@ -65,6 +74,21 @@
         // Check for existing records on load
         onCreated() {
             this.syncRecords()
+            .then(() => {
+                this.maxSize = Object.keys( this.records ).length
+                this.fetchRecords()
+            })
+        }
+
+        fetchRecords( startIndex = 0 ) {
+            let keysArray = Object.keys( this.records )
+            if( startIndex >= keysArray.length ) startIndex = 0
+            this.startIndex = startIndex
+            this.displayedRecords = []
+            for( let i = startIndex; i < startIndex + this.maxRecords; i ++) {
+                if( i >= keysArray.length ) break
+                this.displayedRecords.push( this.records[ keysArray[ i ] ] )
+            }
         }
     }
 
@@ -80,7 +104,7 @@ section {
 }
 
 .debug {
-    width: 20vw;
+    width: 10vw;
 }
 
 table {

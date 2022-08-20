@@ -94,8 +94,8 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
         display: inline-block;
     }
 
-    .debug {
-        /* width: 20vw; */
+    .debug-dialog {
+        display: none;
     }
 
     .home {
