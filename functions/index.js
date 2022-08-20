@@ -1,9 +1,11 @@
 // Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
 
 require = require("esm")(module)
+const cors = require('cors')({origin: true})
 const functions = require("firebase-functions")
-const { runTransaction, deleteField } = require("@firebase/firestore")
+const { runTransaction, deleteField, getDoc } = require("@firebase/firestore")
 const { db, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, TELEMETRY_COLLECTION, STATE_KEY, LOCATION_KEY, LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY, getAggregationReference } = require("./FirestoreSetup.js")
+const { PlayerState } = require("../server/tData")
 
 // Check two location objects for equality, Object structure => { X: 0.00, Y: 0.00 }
 let isEqualLocation = (locA, locB) => {
@@ -158,6 +160,15 @@ let runLocationsTransaction = async ( change ) => {
     })
 }
 
+let loadVizData = async ( isHeatMap = false ) => {
+    let aggregationsRef = await getAggregationReference( isHeatMap ? LOCATION_AGGREGATE_COLLECTION : STATE_AGGREGATE_COLLECTION )
+    if ( !aggregationsRef ) return
+
+    aggregationsDoc = await getDoc( aggregationsRef )
+
+    return aggregationsDoc.data()
+}
+
 // Update necessary collections everytime a document in the telemetry collection gets updated
 exports.aggregateTelemetryData = functions.firestore
     .document( `${TELEMETRY_COLLECTION}/{recordID}` )
@@ -171,3 +182,44 @@ exports.aggregateTelemetryData = functions.firestore
 
         await Promise.all(aggregationTransactions)
     })
+
+exports.getChartData = functions.https.onRequest( async (req, res) => {
+
+    await cors(req, res, async () => {
+        let vizData = await loadVizData()
+        
+        let formattedData = [
+            [ "Player State", "Occurances" ]
+        ]
+    
+        Object.keys( PlayerState ).forEach( ( state ) => {
+            let stateVal = vizData.hasOwnProperty( PlayerState[ state ] ) ? vizData[ PlayerState[ state ] ]: 0
+            formattedData.push( [ state, stateVal ] )
+        })
+        res.send(formattedData)
+    })
+})
+
+exports.getHeatMapData = functions.https.onRequest( async (req, res) => {
+    await cors(req, res, async () => {
+        let vizData = await loadVizData( true )
+            
+        let mapData = []
+        let aggregatedLocations = vizData[ LOCATION_OBJECTS_KEY ]
+        for( let xKey in aggregatedLocations ) {
+            for( let yKey in aggregatedLocations[ xKey ] ) {
+                mapData.push({
+                    x: xKey,
+                    y: yKey,
+                    value: aggregatedLocations[ xKey ][ yKey ]
+                })
+            }
+        }
+        
+        let formattedData = {
+            [LOCATION_MAXIMUM_KEY]: vizData[LOCATION_MAXIMUM_KEY],
+            [LOCATION_OBJECTS_KEY]: mapData
+        }
+        res.send(formattedData)
+    })
+})

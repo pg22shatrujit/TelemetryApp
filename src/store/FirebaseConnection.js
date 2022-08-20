@@ -8,13 +8,14 @@ import { INDEX_NONE, PlayerState } from "../../server/tData";
 
 // Import the functions you need from the SDKs you need
 import { collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { db, TELEMETRY_COLLECTION, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY, getAggregationReference } from "../../functions/FirestoreSetup"
+import { db, TELEMETRY_COLLECTION, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY, getAggregationReference, EMULATOR } from "../../functions/FirestoreSetup"
 
 const baseURL = `http://localhost:5001`
 const prefix = `/telemetrytracking/us-central1`
 
 // Commonly used values as constants
-const FUNCTIONS_URL = 'https://us-central1-telemetrytracking.cloudfunctions.net/'
+let FUNCTIONS_URL = 'https://us-central1-telemetrytracking.cloudfunctions.net/'
+if(EMULATOR) FUNCTIONS_URL = 'http://localhost:5001/telemetrytracking/us-central1/'
 
 export default class FirebaseConnection extends Connection {
 
@@ -138,70 +139,14 @@ export default class FirebaseConnection extends Connection {
         })
     }
 
-    loadVizData( isHeatMap = false ) {
+    // Call a cloud function as a HTTP request
+    callCloudFunction( functionName ) {
 
         return new Promise(( resolve, reject ) => {
-
-            getAggregationReference( isHeatMap ? LOCATION_AGGREGATE_COLLECTION : STATE_AGGREGATE_COLLECTION )
-            .then( aggregationsRef => {
-                if ( !aggregationsRef ) reject("Couldn't find document reference")
-
-                getDoc( aggregationsRef )
-                .then( aggregationsDoc => {
-
-                    resolve( aggregationsDoc.data() ) 
-                })
-                .catch( error => reject( error ) )
-            })
-            .catch( error => reject( error ) )
-        })
-    }
-
-    getChartData() {
-
-        return new Promise(( resolve, reject ) => {
-
-            this.loadVizData()
-            .then( data => {
-                let formattedData = [
-                    [ "Player State", "Occurances" ]
-                ]
-
-                Object.keys( PlayerState ).forEach( ( state ) => {
-                    let stateVal = data.hasOwnProperty( PlayerState[ state ] ) ? data[ PlayerState[ state ] ]: 0
-                    formattedData.push( [ state, stateVal ] )
-                })
-                
-                resolve( formattedData ) 
-            })
-        })
-    }
-
-    getHeatMapData() {
-
-        return new Promise(( resolve, reject ) => {
-
-            this.loadVizData( true )
-            .then( data => {
-                
-                let mapData = []
-                let aggregatedLocations = data[ LOCATION_OBJECTS_KEY ]
-                for( let xKey in aggregatedLocations ) {
-                    for( let yKey in aggregatedLocations[ xKey ] ) {
-                        mapData.push({
-                            x: xKey,
-                            y: yKey,
-                            value: aggregatedLocations[ xKey ][ yKey ]
-                        })
-                    }
-                }
-                
-                let formattedData = {
-                    [LOCATION_MAXIMUM_KEY]: data[LOCATION_MAXIMUM_KEY],
-                    [LOCATION_OBJECTS_KEY]: mapData
-                }
-
-                resolve( formattedData )
+            this.functions.get( functionName )
+            .then( ( response ) => {
+                if( response.data ) resolve( response.data )
+                reject( response.status )
             })
         })
     }
