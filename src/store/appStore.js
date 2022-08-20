@@ -91,14 +91,15 @@ export default {
             })
         },
 
+        // Call cloud functions to get data for the bar chart and the heat map
         fetchVizData({ commit }, params) {
             
-            let chartData = dataService.callCloudFunction( 'getChartData' )
+            let chartData = dataService.callFunction( 'getChartData' )
             chartData.then( result => {
                 commit('UPDATE_CHART_DATA', result)
             })
 
-            let mapData = dataService.callCloudFunction( 'getHeatMapData' )
+            let mapData = dataService.callFunction( 'getHeatMapData' )
             mapData.then( result => {
                 commit('UPDATE_MAP_DATA', result)
             })

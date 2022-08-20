@@ -30,6 +30,7 @@ let getKeyData = ( change, key, isBeforeChange = false ) => {
     return change.after.exists ? change.after.data()[ key ] : null
 }
 
+// Updates the aggregations for playerState
 let updateStateAggegation = ( aggregation, after, before ) => {
     // Increase the count for the new state if it exists in the aggregation (Set it to one if it doesn't)
     if( after != null) {
@@ -49,6 +50,7 @@ let updateStateAggegation = ( aggregation, after, before ) => {
     }
 }
 
+// Runs transaction to register any required changes to playerState aggregation
 let runStatesTransaction = async ( change ) => {
     await runTransaction( db, async ( transaction ) => {
 
@@ -86,6 +88,7 @@ findLocationMaxima = ( newMaximum, aggregationValues ) => {
     return newMaximum
 }
 
+// Update the aggregation for location values
 let updateLocationAggregation = ( aggregation, after, before ) => {
 
         if( !aggregation.hasOwnProperty( LOCATION_MAXIMUM_KEY ) ) aggregation[ LOCATION_MAXIMUM_KEY ] = 0
@@ -136,6 +139,7 @@ let updateLocationAggregation = ( aggregation, after, before ) => {
         }
 }
 
+// Runs transaction to register any required changes to location aggregation
 let runLocationsTransaction = async ( change ) => {
     await runTransaction( db, async ( transaction ) => {
 
@@ -160,6 +164,7 @@ let runLocationsTransaction = async ( change ) => {
     })
 }
 
+// Loads data for visualizaztions, bool to flip between bar chart and heat map data
 let loadVizData = async ( isHeatMap = false ) => {
     let aggregationsRef = await getAggregationReference( isHeatMap ? LOCATION_AGGREGATE_COLLECTION : STATE_AGGREGATE_COLLECTION )
     if ( !aggregationsRef ) return
@@ -183,6 +188,7 @@ exports.aggregateTelemetryData = functions.firestore
         await Promise.all(aggregationTransactions)
     })
 
+// Returns data to populate the bar chart in the right format
 exports.getChartData = functions.https.onRequest( async (req, res) => {
 
     await cors(req, res, async () => {
@@ -200,6 +206,7 @@ exports.getChartData = functions.https.onRequest( async (req, res) => {
     })
 })
 
+// Returns data to populate the heat map in the right format
 exports.getHeatMapData = functions.https.onRequest( async (req, res) => {
     await cors(req, res, async () => {
         let vizData = await loadVizData( true )

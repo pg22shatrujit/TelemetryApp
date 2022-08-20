@@ -6,9 +6,13 @@
 <template>
 
     <section :class="{ debug: debugWidth }">
-        <button @click.prevent="fetchRecords( startIndex - maxRecords )">Previous</button>
+
+        <!-- Cycle throught records so too many aren't on the screen at once -->
+        <button @click.prevent="fetchRecordsInRange( startIndex - maxRecords )">Previous</button>
         {{ startIndex + 1 }} to {{ ( startIndex + maxRecords ) > maxSize ? maxSize : startIndex + maxRecords  }} of {{ maxSize }}
-        <button @click.prevent="fetchRecords( startIndex + maxRecords )">Next</button>
+        <button @click.prevent="fetchRecordsInRange( startIndex + maxRecords )">Next</button>
+
+        
         <table>
             <tr>
                 <th> ID </th>
@@ -76,11 +80,12 @@
             this.syncRecords()
             .then(() => {
                 this.maxSize = Object.keys( this.records ).length
-                this.fetchRecords()
+                this.fetchRecordsInRange()
             })
         }
 
-        fetchRecords( startIndex = 0 ) {
+        // 
+        fetchRecordsInRange( startIndex = 0 ) {
             let keysArray = Object.keys( this.records )
             if( startIndex >= keysArray.length ) startIndex = 0
             this.startIndex = startIndex
@@ -104,7 +109,7 @@ section {
 }
 
 .debug {
-    width: 10vw;
+    /* width: 10vw; */
 }
 
 table {

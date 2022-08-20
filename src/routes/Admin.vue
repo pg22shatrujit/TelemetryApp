@@ -10,7 +10,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     <section class="home-container">
         <div class="home">
             <div class="title">Admin</div>
-            <div class="dialog" :class="{ 'debug-dialog': debugWidth }">
+            <div class="dialog"> <!-- :class="{ 'debug-dialog': debugWidth }> -->
 
                 <form class="sample-form" @submit.prevent="submitFormData()">
                     <label>Version
@@ -79,6 +79,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
             this.resetCurrentRecord();
         }
 
+        // For testing data, generates records with randomized values
         generateXRecords( X ) {
             for( let i = 0; i < X; i++ ) {
                 let nextRecord = new TData()
@@ -91,6 +92,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
             }
         }
 
+        // Wrapper for randomization
         random( max ) {
             return Math.round( Math.random() * max )
         }

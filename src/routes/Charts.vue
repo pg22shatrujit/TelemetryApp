@@ -40,15 +40,18 @@ Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
             this.injectActions(['fetchVizData'])
         }
 
+        // Set up an interval to poll the cloud for data
         onCreated() {
-            setTimeout( this.refreshDataAndHeatMap, 2000 )
+            this.refreshDataAndHeatMap()
             this.dataRefreshInterval = setInterval( this.refreshDataAndHeatMap, 5000 )
         }
 
+        // Clear the interval when leaving the view to stop reference errors
         onBeforeDestroy() {
             clearInterval(this.dataRefreshInterval)
         }
 
+        // Fetch data and refresh the heat map on success
         refreshDataAndHeatMap() {
             this.fetchVizData()
             .then(() => {
