@@ -3,7 +3,7 @@ VFS VUE Single File Component
 
 <pg-home user="User"></pg-home>
 
-Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
+Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
 -->
 <template>
 
@@ -11,16 +11,10 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         <h3>Telemetry Analysis Charts</h3>
         <div class="container chart-area">
             <div id="chart-1" class="area chart">
-                This is where one chart goes
+                <t-bar-chart :data="chartData" title="Player States" />
             </div>
             <div id="chart-2" class="area chart">
-                This is where two chart goes
-            </div>
-            <div id="chart-3" class="area chart">
-                This is where three chart goes
-            </div>
-            <div id="chart-4" class="area chart">
-                This is where four chart goes
+                <t-heat-map :data="mapData" title="Location Heatmap" src="layout.png" ref="locMap"/>
             </div>
         </div>
     </section>
@@ -29,24 +23,44 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 <script>
 
     import Controller from '@/mixins/controller'
+    import TBarChart from '@/components/BarChart.vue'
+    import THeatMap from '@/components/HeatMap.vue'
 
     class HomeController extends Controller {
 
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
             this.vm = {
-                formData: {
-                    sampleOne:"",
-                    sampleTwo:42,
-                }
+                dataRefreshInterval: null
             }
             this.props = {
                 name: String,
             }
+            this.injectGetters(['chartData', 'mapData'])
+            this.injectActions(['fetchVizData'])
+        }
+
+        // Set up an interval to poll the cloud for data
+        onCreated() {
+            this.refreshDataAndHeatMap()
+            this.dataRefreshInterval = setInterval( this.refreshDataAndHeatMap, 5000 )
+        }
+
+        // Clear the interval when leaving the view to stop reference errors
+        onBeforeDestroy() {
+            clearInterval(this.dataRefreshInterval)
+        }
+
+        // Fetch data and refresh the heat map on success
+        refreshDataAndHeatMap() {
+            this.fetchVizData()
+            .then(() => {
+                if( this.$refs.locMap ) this.$refs.locMap.refreshHeatMapData()
+            })
         }
     }
 
-    export default new HomeController('pgHome');
+    export default new HomeController('pgHome', { TBarChart, THeatMap });
 
 </script>
 <style scoped>
