@@ -3,7 +3,7 @@ VFS VUE Single File Component
 
 <pg-home user="User"></pg-home>
 
-Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
+Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
 -->
 <template>
 
@@ -11,16 +11,10 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
         <h3>Telemetry Analysis Charts</h3>
         <div class="container chart-area">
             <div id="chart-1" class="area chart">
-                <t-bar-chart :data="chartData" title="Player States" subtitle="Count of occurances"/>
+                <t-bar-chart :data="chartData" title="Player States" />
             </div>
             <div id="chart-2" class="area chart">
-                This is where two chart goes
-            </div>
-            <div id="chart-3" class="area chart">
-                This is where three chart goes
-            </div>
-            <div id="chart-4" class="area chart">
-                This is where four chart goes
+                <t-heat-map :data="mapData" title="Location Heatmap" src="layout.png" ref="locMap"/>
             </div>
         </div>
     </section>
@@ -30,6 +24,7 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
 
     import Controller from '@/mixins/controller'
     import TBarChart from '@/components/BarChart.vue'
+    import THeatMap from '@/components/HeatMap.vue'
 
     class HomeController extends Controller {
 
@@ -44,17 +39,24 @@ Copyright (c) 2018. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
             this.props = {
                 name: String,
             }
-            this.injectGetters(['chartData'])
-            this.injectActions(['fetchChartData'])
+            this.injectGetters(['chartData', 'mapData'])
+            this.injectActions(['fetchVizData'])
         }
 
-        // Check for existing records on load
         onCreated() {
-            this.fetchChartData()
+            setTimeout( this.refreshDataAndHeatMap, 2000 )
+            let dataRefreshInterval = setInterval( this.refreshDataAndHeatMap, 5000 )
+        }
+
+        refreshDataAndHeatMap() {
+            this.fetchVizData()
+            .then(() => {
+                this.$refs.locMap.refreshHeatMapData()
+            })
         }
     }
 
-    export default new HomeController('pgHome', { TBarChart });
+    export default new HomeController('pgHome', { TBarChart, THeatMap });
 
 </script>
 <style scoped>
