@@ -1,6 +1,7 @@
 // Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 const { response } = require('express')
 const Express = require('express')
+const { LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY } = require('../functions/FirestoreSetup')
 const Result = require('../src/mixins/result')
 
 const TData = require('./tData').default
@@ -66,17 +67,34 @@ Router.delete('/single/:id', ( request, response, next ) => {
     next()
 })
 
-// Router.get('/actionSummary/:id/:sessionId', ( request, response, next ) => {
+// Sample data to populate the chart on the local server
+Router.get('/getChartData', ( request, response, next ) => {
     
-//     const data = [
-//         ['Year', 'Sales', 'Expenses', 'Profit'],
-//         ['2014', 1000, 400, 200],
-//         ['2015', 1170, 460, 250],
-//         ['2016', 660, 1120, 300],
-//         ['2017', 1030, 540, 350]
-//     ]
-//     response.send(resultOK(data))
-//     next()
-// })
+    const data = [
+        [ 'Player State', 'Occurances' ],
+        [ 'WALK', 1000 ],
+        [ 'RUN', 1170 ],
+        [ 'CROUCH', 660 ],
+        [ 'PRONE', 1030 ]
+    ]
+    response.send(resultOK(data))
+    next()
+})
+
+// Sample data to populate the heat map on the local server
+Router.get('/getHeatMapData', ( request, response, next ) => {
+    
+    const data = {
+        [ LOCATION_MAXIMUM_KEY ]: 5,
+        [ LOCATION_OBJECTS_KEY ]: [
+            { x: 0, y: 0, value: 1 },
+            { x: 0, y: 250, value: 5 },
+            { x: 50, y: 30, value: 2 },
+            { x: 50, y: 150, value: 3 },
+        ]
+    }
+    response.send(resultOK(data))
+    next()
+})
 
 module.exports = Router
