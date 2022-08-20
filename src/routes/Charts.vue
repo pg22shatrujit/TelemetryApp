@@ -31,10 +31,7 @@ Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
         constructor( name, subComponentList = []) {
             super( name, subComponentList );
             this.vm = {
-                formData: {
-                    sampleOne:"",
-                    sampleTwo:42,
-                },
+                dataRefreshInterval: null
             }
             this.props = {
                 name: String,
@@ -45,13 +42,17 @@ Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
 
         onCreated() {
             setTimeout( this.refreshDataAndHeatMap, 2000 )
-            let dataRefreshInterval = setInterval( this.refreshDataAndHeatMap, 5000 )
+            this.dataRefreshInterval = setInterval( this.refreshDataAndHeatMap, 5000 )
+        }
+
+        onBeforeDestroy() {
+            clearInterval(this.dataRefreshInterval)
         }
 
         refreshDataAndHeatMap() {
             this.fetchVizData()
             .then(() => {
-                this.$refs.locMap.refreshHeatMapData()
+                if( this.$refs.locMap ) this.$refs.locMap.refreshHeatMapData()
             })
         }
     }

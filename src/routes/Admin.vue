@@ -10,7 +10,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     <section class="home-container">
         <div class="home">
             <div class="title">Admin</div>
-            <div class="dialog" :class="{ debug: debugWidth }">
+            <div class="dialog" :class="{ 'debug-dialog': debugWidth }">
 
                 <form class="sample-form" @submit.prevent="submitFormData()">
                     <label>Version
@@ -42,10 +42,11 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
 
                     <button @click.prevent="resetCurrentRecord()">New</button>
                     <button @click.prevent="syncRecords()">Resync</button>
+                    <button @click.prevent="generateXRecords( 100 )">Generate 100 Records</button>
                 </form>
 
             </div>
-            <t-table />
+            <t-table :max-records=10 />
         </div>
     </section>
 
@@ -56,7 +57,7 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
     import tTable from '@/components/TelemetryTable'
     import { DEBUG } from '@/store/appStore'
     import { EMULATOR } from '../../functions/FirestoreSetup'
-    import { PlayerState } from '../../server/tData'
+    import TData, { PlayerState } from '../../server/tData'
 
     class AdminController extends Controller {
 
@@ -76,6 +77,22 @@ Copyright (C) Shatrujit Aditya Kumar 2022, All Rights Reserved
         submitFormData() {
             this.postRecord(this.currentRecord);
             this.resetCurrentRecord();
+        }
+
+        generateXRecords( X ) {
+            for( let i = 0; i < X; i++ ) {
+                let nextRecord = new TData()
+                nextRecord.sessionID = this.random( 100 )
+                nextRecord.eventID = this.random( 100 )
+                nextRecord.playerState = this.random( Object.keys( PlayerState ).length - 1 )
+                nextRecord.X = this.random( 400 )
+                nextRecord.Y = this.random( 300 )
+                this.postRecord( nextRecord )
+            }
+        }
+
+        random( max ) {
+            return Math.round( Math.random() * max )
         }
     }
 
