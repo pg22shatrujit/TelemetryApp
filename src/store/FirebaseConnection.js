@@ -8,13 +8,12 @@ import { INDEX_NONE, PlayerState } from "../../server/tData";
 
 // Import the functions you need from the SDKs you need
 import { collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { db, TELEMETRY_COLLECTION, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, getAggregationReference } from "../../functions/FirestoreSetup"
+import { db, TELEMETRY_COLLECTION, STATE_AGGREGATE_COLLECTION, LOCATION_AGGREGATE_COLLECTION, LOCATION_MAXIMUM_KEY, LOCATION_OBJECTS_KEY, getAggregationReference } from "../../functions/FirestoreSetup"
 
 const baseURL = `http://localhost:5001`
 const prefix = `/telemetrytracking/us-central1`
 
 // Commonly used values as constants
-export const LOCAL_EMULATOR = true
 const FUNCTIONS_URL = 'https://us-central1-telemetrytracking.cloudfunctions.net/'
 
 export default class FirebaseConnection extends Connection {
@@ -184,7 +183,25 @@ export default class FirebaseConnection extends Connection {
 
             this.loadVizData( true )
             .then( data => {
-                resolve( data )
+                
+                let mapData = []
+                let aggregatedLocations = data[ LOCATION_OBJECTS_KEY ]
+                for( let xKey in aggregatedLocations ) {
+                    for( let yKey in aggregatedLocations[ xKey ] ) {
+                        mapData.push({
+                            x: xKey,
+                            y: yKey,
+                            value: aggregatedLocations[ xKey ][ yKey ]
+                        })
+                    }
+                }
+                
+                let formattedData = {
+                    [LOCATION_MAXIMUM_KEY]: data[LOCATION_MAXIMUM_KEY],
+                    [LOCATION_OBJECTS_KEY]: mapData
+                }
+
+                resolve( formattedData )
             })
         })
     }

@@ -25,13 +25,15 @@ export default {
         records: {},
         currentRecord: new TData,
         chartData: [],
+        mapData: {}
     },
 
     getters: {
         title: state => state.appTitle,
         records: state => state.records,
         currentRecord: state => state.currentRecord,
-        chartData: state => state.chartData
+        chartData: state => state.chartData,
+        mapData: state => state.mapData
     },
 
     actions: {
@@ -89,30 +91,20 @@ export default {
             })
         },
 
-        fetchChartData({ commit }, params) {
-            // Get data from the server
-
-            // TODO Change to call execute
-            return new Promise(( resolve, reject ) => {
-                const id = '1234'
-                const session = '001'
-                dataService.getChartData()
-                .then( result => {
-                    commit('UPDATE_ACTION_SUMMARY', result)
-                    resolve( result.status )
-                })
-                .catch( error => reject( error ))
-            // Fill up chart when we get a response
+        fetchVizData({ commit }, params) {
+            
+            let chartData = dataService.getChartData()
+            chartData.then( result => {
+                commit('UPDATE_CHART_DATA', result)
             })
+
+            let mapData = dataService.getHeatMapData()
+            mapData.then( result => {
+                commit('UPDATE_MAP_DATA', result)
+            })
+
+            return Promise.all([ chartData, mapData ])
         },
-
-        callHelloWorld({ commit }, params) {
-            // Get data from the server
-
-            // TODO Change to call execute
-            dataService.callCloudHello()
-            // Fill up chart when we get a response
-        }
     },
 
     mutations: {
@@ -142,8 +134,9 @@ export default {
             Vue.set( state.records, TDataRecord.id, TDataRecord) 
         },
         DELETE_RECORD: ( state, id ) => { Vue.delete( state.records, id ) },
-        UPDATE_ACTION_SUMMARY: (state, data ) => { 
-            state.chartData = data
-        }
+
+        // Mutations to update data used for bar chart and heatmap
+        UPDATE_CHART_DATA: ( state, data ) => { state.chartData = data },
+        UPDATE_MAP_DATA: ( state, data ) => { state.mapData = data },
     },
 }
