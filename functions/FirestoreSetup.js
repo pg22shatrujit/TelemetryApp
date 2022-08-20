@@ -1,3 +1,4 @@
+// Copyright (C) Shatrujit Aditya Kumar, 2022. All Rights Reserved
 const { getFirestore, connectFirestoreEmulator, getDocs, addDoc, doc, collection } = require("@firebase/firestore")
 const { initializeApp } = require("firebase/app");
 
@@ -22,8 +23,10 @@ export const TELEMETRY_COLLECTION = "Telemetry"
 // Keys for data to be aggregated
 export const STATE_KEY = "playerState"
 export const LOCATION_KEY = "location"
+export const LOCATION_MAXIMUM_KEY = "Max"
+export const LOCATION_OBJECTS_KEY = "Values"
 
-const EMULATOR = true
+export const EMULATOR = true
 if( EMULATOR ) connectFirestoreEmulator(db, 'localhost', 8080)
 
 // Get a reference to the first document in a collection, creating one if the collection is empty
