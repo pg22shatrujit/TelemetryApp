@@ -93,12 +93,12 @@ export default {
 
         fetchVizData({ commit }, params) {
             
-            let chartData = dataService.getChartData()
+            let chartData = dataService.callCloudFunction( 'getChartData' )
             chartData.then( result => {
                 commit('UPDATE_CHART_DATA', result)
             })
 
-            let mapData = dataService.getHeatMapData()
+            let mapData = dataService.callCloudFunction( 'getHeatMapData' )
             mapData.then( result => {
                 commit('UPDATE_MAP_DATA', result)
             })
