@@ -14,6 +14,7 @@ export default class Connection {
     read( request ) {}
     write( request, data ) {}
     delete( request, data ) {}
+    callFunction( functionName ) {}
 
     close() {}
 }

@@ -140,7 +140,7 @@ export default class FirebaseConnection extends Connection {
     }
 
     // Call a cloud function as a HTTP request
-    callCloudFunction( functionName ) {
+    callFunction( functionName ) {
 
         return new Promise(( resolve, reject ) => {
             this.functions.get( functionName )

@@ -48,6 +48,21 @@ export default class ExpressConnection extends Connection {
         })
     }
 
+    // Simulate cloud function on the local server
+    callFunction( functionName ) {
+
+        return new Promise(( resolve, reject ) => {
+
+            this.db.get( `${prefix}/${functionName}` )
+            .then( response => response.data )
+            // Clean data and send back only the payload
+            .then( data => ( data.error ? error => { throw( error ) } : data.payload ))
+            .then( content => resolve( content ))
+            .catch( error => reject( error ))
+
+        })
+    }
+
     delete( request ) {
 
         return new Promise(( resolve, reject ) => {
